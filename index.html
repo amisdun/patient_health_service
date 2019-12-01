@@ -72,7 +72,7 @@
                     <a class="nav-link link text-white dropdown-toggle display-4"  href="#" data-toggle="dropdown-submenu" aria-expanded="true" id="prescriptions">
                         <span class="mbrib-alert mbr-iconfont mbr-iconfont-btn"></span> &nbsp;
                     </a>
-                    <div class="dropdown-menu" id="pres" style="overflow:auto;height:600px">
+                    <div class="dropdown-menu" id="pres">
                         <!--<a class="text-white dropdown-item display-4" href="#"><span class="mbri-drag-n-drop2 mbr-iconfont mbr-iconfont-btn"></span>New Item</a>-->
                     </div>
                 </li>
@@ -158,31 +158,34 @@
                   "Authorization" : `Bearer ${localToken}`
               },
               success: function(res){
-                  console.log(res)
                   if(res.data.length > 0){
+                      console.log(res)
                     $("li a#prescriptions").append("Prescriptions "+ res.data.length);
                     var new_pres = '';
                         $.each(res.data,function(index,data){
                             new_pres = new_pres 
-                                +'<a class="text-white dropdown-item display-4"><span class="mbri-drag-n-drop2 mbr-iconfont mbr-iconfont-btn"></span>'+data.case_history+'<br>'+data.medication+'<br></span></a><hr><br>'
-                                +'<button class="btn btn-sm btn-primary" id="'+res.data.id+'">submit</button>'
+                                +'<a class="text-white dropdown-item display-4"><span class="mbri-drag-n-drop2 mbr-iconfont mbr-iconfont-btn"></span>Description: '+data.case_history+'<br>Medication: '+data.medication+'<br></span></a><hr><br>'
+                                +'<button class="btn btn-sm btn-primary pres_id" id="'+data.id+'">submit</button>'
                                 if(data.submitted == 1){
-                                    $("button.btn").attr("disabled","true")
+                                    $("button.btn").attr("disabled","true");
                                 }
                                 else{
-                                    $("button.btn").attr("disabled","false")
+                                    $("button.btn").attr("disabled","false");
                                 }
                         })
                         $("div#pres").append(new_pres)
-                        $("button.btn").click(function(e){
+                        $("button.pres_id").click(function(e){
                             e.preventDefault();
                             var prescription_id = e.currentTarget.id;
+                            console.log(prescription_id)
                             $.ajax({
-                                url: `https://virtual-healthcare.herokuapp.com/api/patient/prescriptions/${prescription_id}/submit`,
-                                method: "get",
+                                url: `https://virtual-healthcare.herokuapp.com/api/patient/prescription/${prescription_id}/submit`,
+                                method: "put",
                                 success: function(res){
                                     if(res){
-                                        console.log(res)
+                                        if(res.data.submitted == 1){
+                                            alert("Submtted successfully")
+                                        }
                                     }
                                 },
                                 error: function(err){
